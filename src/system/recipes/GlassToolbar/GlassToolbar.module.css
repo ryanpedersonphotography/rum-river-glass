@@ -345,15 +345,11 @@
 
   /* CSS baseline (matches old glass-toolbar.css behavior): hidden by default,
      revealed when data-expanded=true on the root. Helps if JS/motion hiccups. */
-  transform: translateX(-100%);
-  opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
 }
 
 .root[data-expanded="true"] .panel {
-  transform: translateX(0);
-  opacity: 1;
   pointer-events: auto;
 }
 
