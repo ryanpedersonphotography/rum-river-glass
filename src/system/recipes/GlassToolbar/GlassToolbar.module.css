@@ -1,0 +1,470 @@
+/* ===========================================================================
+   GlassToolbar.module.css
+   Scoped styles for src/system/recipes/GlassToolbar/GlassToolbar.tsx
+
+   Notes:
+   - Variables are attached to :global(:root) so this recipe can be dropped in without editing your theme file.
+   - If you prefer, move the --glass-toolbar-* variables into your global tokens and delete the :global(:root) block.
+   =========================================================================== */
+
+:global(:root) {
+  /* Theme toggle defaults (dark theme baseline) */
+  --glass-toolbar-text: rgba(255, 255, 255, 0.82);
+  --glass-toolbar-hover: rgba(255, 255, 255, 0.14);
+
+  /* Premium walnut & gold theme colors */
+  --walnut-dark: #191410;
+  --walnut-darker: #0f0c0a;
+  --walnut-darkest: #080605;
+  --walnut-medium: #2a201a;
+  --walnut-highlight: #3d2f25;
+  --toolbar-gold: oklch(0.88 0.07 88);
+  --toolbar-gold-bright: oklch(0.92 0.09 88);
+  --toolbar-gold-muted: oklch(0.75 0.06 88);
+
+  /* NOTE: --sidebar-width and --glass-toolbar-rail-width are defined in theme.css */
+  /* DO NOT add hardcoded widths here - use var(--sidebar-width) */
+  --glass-toolbar-panel-width: 380px;
+  --glass-toolbar-offset: var(--glass-toolbar-rail-width);
+  --glass-toolbar-shadow: 0 24px 56px rgba(0, 0, 0, 0.12);
+  --glass-toolbar-duration: 300ms;
+  --glass-toolbar-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Enhanced glass effect */
+  --glass-toolbar-frost-bg: rgba(25, 20, 16, 0.68);
+  --glass-toolbar-frost-border: rgba(255, 255, 255, 0.16);
+  --glass-toolbar-frost-highlight: rgba(255, 255, 255, 0.08);
+  --glass-toolbar-frost-accent: 255, 255, 255;
+
+  /* Additional theme colors */
+  --glass-toolbar-border: rgba(255, 255, 255, 0.14);
+  --glass-toolbar-panel-bg: rgba(25, 20, 16, 0.82);
+  --glass-toolbar-panel-border: rgba(255, 255, 255, 0.14);
+  --glass-toolbar-pill-bg: rgba(255, 255, 255, 0.06);
+  --glass-toolbar-pill-hover-bg: rgba(255, 255, 255, 0.10);
+  --glass-toolbar-pill-active-bg: rgba(255, 255, 255, 0.15);
+  --glass-toolbar-pill-label: rgba(255, 255, 255, 0.65);
+  --glass-toolbar-pill-label-active: rgba(255, 255, 255, 0.90);
+  --glass-toolbar-icon-active: rgba(255, 255, 255, 0.95);
+  --glass-toolbar-cta-bg: rgba(255, 255, 255, 0.06);
+  --glass-toolbar-cta-border: rgba(255, 255, 255, 0.12);
+
+  /* Toggle + footer */
+  --glass-toolbar-footer-hover-bg: rgba(255, 255, 255, 0.10);
+  --glass-toolbar-footer-hover-border: rgba(255, 255, 255, 0.18);
+  --glass-toolbar-mark-bg: rgba(255, 255, 255, 0.08);
+  --glass-toolbar-mark-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Light theme overrides */
+:global(:root):not([data-theme="dark"]) .root,
+:global(html[data-theme="light"]) .root {
+  --glass-toolbar-frost-bg: rgba(255, 255, 255, 0.78);
+  --glass-toolbar-frost-border: rgba(0, 0, 0, 0.12);
+  --glass-toolbar-frost-highlight: rgba(255, 255, 255, 0.92);
+  --glass-toolbar-text: rgba(25, 20, 16, 0.85);
+  --glass-toolbar-hover: rgba(0, 0, 0, 0.06);
+  --glass-toolbar-panel-bg: rgba(255, 255, 255, 0.92);
+  --glass-toolbar-panel-border: rgba(0, 0, 0, 0.10);
+  --glass-toolbar-pill-bg: rgba(0, 0, 0, 0.04);
+  --glass-toolbar-pill-hover-bg: rgba(0, 0, 0, 0.06);
+  --glass-toolbar-pill-active-bg: rgba(0, 0, 0, 0.08);
+  --glass-toolbar-pill-label: rgba(25, 20, 16, 0.64);
+  --glass-toolbar-pill-label-active: rgba(25, 20, 16, 0.9);
+  --glass-toolbar-icon-active: rgba(25, 20, 16, 0.9);
+  --glass-toolbar-cta-bg: rgba(0, 0, 0, 0.04);
+  --glass-toolbar-cta-border: rgba(0, 0, 0, 0.10);
+  --glass-toolbar-footer-hover-bg: rgba(0, 0, 0, 0.06);
+  --glass-toolbar-footer-hover-border: rgba(0, 0, 0, 0.12);
+}
+
+/* Root wrapper */
+.root {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 999;
+  display: flex;
+  align-items: stretch;
+  pointer-events: none;
+}
+
+/* Rail */
+.rail {
+  width: var(--glass-toolbar-rail-width, 78px);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 10px;
+  gap: 16px;
+
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--glass-toolbar-frost-bg) 96%, transparent) 0%,
+    color-mix(in oklab, var(--glass-toolbar-frost-bg) 86%, transparent) 100%
+  );
+
+  border-right: 1px solid var(--glass-toolbar-frost-border);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glass-toolbar-frost-highlight) 18%, transparent),
+    0 18px 50px rgba(0, 0, 0, 0.18);
+
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+  pointer-events: auto;
+}
+
+/* Rail top */
+.railTop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.02)
+  );
+
+  border: 1px solid color-mix(in oklab, var(--glass-toolbar-frost-border) 90%, transparent);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.logoImage {
+  opacity: 0.92;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.16));
+}
+
+.railLabel {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--glass-toolbar-text) 80%, transparent);
+}
+
+/* Primary nav */
+.primary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+/* Pills */
+.pill {
+  width: 100%;
+  border: 1px solid transparent;
+  background: var(--glass-toolbar-pill-bg);
+  border-radius: 16px;
+  padding: 10px 8px;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  gap: 10px;
+
+  cursor: pointer;
+  color: var(--glass-toolbar-text);
+  transition: transform 180ms var(--glass-toolbar-ease), background 180ms var(--glass-toolbar-ease), border-color 180ms var(--glass-toolbar-ease);
+}
+
+.pill:hover,
+.pill:focus-visible {
+  background: var(--glass-toolbar-pill-hover-bg);
+  border-color: color-mix(in oklab, var(--glass-toolbar-frost-border) 90%, transparent);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.pill[data-has-children="true"]::after {
+  content: "";
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--toolbar-gold) 60%, transparent);
+  opacity: 0.55;
+  margin-top: 6px;
+}
+
+.pillIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  transition: background 180ms var(--glass-toolbar-ease), border-color 180ms var(--glass-toolbar-ease), transform 180ms var(--glass-toolbar-ease);
+}
+
+.pillIcon svg {
+  width: 20px;
+  height: 20px;
+  color: color-mix(in oklab, var(--glass-toolbar-text) 82%, transparent);
+  transition: color 180ms var(--glass-toolbar-ease);
+}
+
+.pillLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--glass-toolbar-pill-label);
+  transition: color 180ms var(--glass-toolbar-ease);
+}
+
+/* Active pill state */
+.pillActive .pillIcon {
+  background: color-mix(in oklab, var(--toolbar-gold) 16%, rgba(255, 255, 255, 0.06));
+  border-color: color-mix(in oklab, var(--toolbar-gold) 42%, rgba(255, 255, 255, 0.12));
+}
+
+.pillActive .pillIcon svg {
+  color: var(--glass-toolbar-icon-active);
+}
+
+.pillActive:hover .pillIcon,
+.pillActive:focus-visible .pillIcon {
+  transform: translateY(-1px);
+}
+
+.pillActive .pillLabel {
+  color: var(--glass-toolbar-pill-label-active);
+}
+
+/* Rail footer */
+.railFooter {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Theme toggle */
+.themeToggle {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--glass-toolbar-text, hsl(0 0% 100% / 0.8));
+}
+
+.themeToggle:hover {
+  background: var(--glass-toolbar-hover, hsl(0 0% 100% / 0.1));
+  color: var(--glass-toolbar-text, hsl(0 0% 100%));
+}
+
+.themeIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Theme toggle icon visibility */
+:global([data-theme='dark']) :global([data-hide-on-theme='dark']),
+:global([data-theme='light']) :global([data-hide-on-theme='light']) {
+  display: none;
+}
+
+/* Expand / collapse toggle */
+.toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in oklab, var(--glass-toolbar-frost-border) 90%, transparent);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--glass-toolbar-text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 180ms var(--glass-toolbar-ease), background 180ms var(--glass-toolbar-ease);
+}
+
+.toggle:hover,
+.toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.10);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Panel */
+.panel {
+  width: var(--glass-toolbar-panel-width);
+  height: 100vh;
+
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--glass-toolbar-panel-bg) 94%, transparent) 0%,
+    color-mix(in oklab, var(--glass-toolbar-panel-bg) 86%, transparent) 100%
+  );
+
+  border-right: 1px solid var(--glass-toolbar-panel-border);
+  box-shadow: var(--glass-toolbar-shadow);
+
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+  pointer-events: auto;
+}
+
+.panelBody {
+  padding: 18px 18px 10px 18px;
+}
+
+/* Subnav */
+.subnav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.subnav li {
+  margin: 0;
+}
+
+.subnav a,
+.subnav button {
+  width: 100%;
+  text-align: left;
+  border: 1px solid color-mix(in oklab, var(--glass-toolbar-cta-border) 80%, transparent);
+  background: var(--glass-toolbar-cta-bg);
+  border-radius: 16px;
+  padding: 12px 12px;
+
+  display: grid;
+  gap: 6px;
+
+  color: var(--glass-toolbar-text);
+  cursor: pointer;
+
+  transition: transform 180ms var(--glass-toolbar-ease), background 180ms var(--glass-toolbar-ease), border-color 180ms var(--glass-toolbar-ease);
+  text-decoration: none;
+}
+
+.subnav a:hover,
+.subnav a:focus-visible,
+.subnav button:hover,
+.subnav button:focus-visible {
+  background: var(--glass-toolbar-footer-hover-bg);
+  border-color: var(--glass-toolbar-footer-hover-border);
+  transform: translateX(3px);
+  outline: none;
+}
+
+.subnav small {
+  font-size: 12px;
+  opacity: 0.72;
+}
+
+.empty {
+  margin: 0;
+  padding: 14px 12px;
+  border-radius: 14px;
+  border: 1px dashed color-mix(in oklab, var(--glass-toolbar-panel-border) 70%, transparent);
+  opacity: 0.72;
+}
+
+/* Footer CTAs inside the panel */
+.footer {
+  margin-top: 14px;
+  padding: 0 18px 18px 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.footerCta {
+  width: 100%;
+  border: 1px solid var(--glass-toolbar-cta-border);
+  background: var(--glass-toolbar-cta-bg);
+  color: var(--glass-toolbar-text);
+  border-radius: 16px;
+  padding: 12px 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  cursor: pointer;
+  transition: transform 180ms var(--glass-toolbar-ease), background 180ms var(--glass-toolbar-ease), border-color 180ms var(--glass-toolbar-ease);
+}
+
+.footerCta svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.9;
+}
+
+.footerCta:hover,
+.footerCta:focus-visible {
+  border-color: var(--glass-toolbar-footer-hover-border);
+  background: var(--glass-toolbar-footer-hover-bg);
+  transform: translateX(4px);
+  outline: none;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .panel,
+  .pill svg,
+  .toggle,
+  .subnav button,
+  .footerCta {
+    transition: none !important;
+  }
+}
+
+/* Mobile breakpoint - must match your layout system (768px) */
+@media (max-width: 768px) {
+  :global(:root) {
+    --glass-toolbar-panel-width: 320px;
+  }
+
+  .rail {
+    padding: 14px 8px;
+  }
+
+  .pillLabel {
+    display: none;
+  }
+
+  .panelBody {
+    padding: 16px 16px 10px 16px;
+  }
+}
+
+/* Optional wrapper classes if you use a toolbar-aware layout wrapper */
+.layout {
+  min-height: 100vh;
+}
+
+.layoutContent {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GlassToolbar } from "@/system/recipes/GlassToolbar";
 
 export const metadata: Metadata = {
   title: "Rum River Glass",
@@ -14,7 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <GlassToolbar />
+        <div style={{ paddingLeft: "var(--glass-toolbar-offset, var(--glass-toolbar-rail-width, 78px))" }}>
+          {children}
+        </div>
       </body>
     </html>
   );
