@@ -110,13 +110,9 @@ const PANEL_VARIANTS_EXPRESSIVE: Variants = {
     boxShadow: "none",
     pointerEvents: "none",
     transition: {
-      type: "spring",
-      stiffness: 320,
-      damping: 36,
-      bounce: 0,
-      restDelta: 0.5,
-      restSpeed: 0.5,
-      opacity: { duration: 0.2, delay: 0.04 },
+      duration: 0.8,
+      ease: [0.4, 0, 0.2, 1],
+      opacity: { duration: 0.4 }
     },
     transitionEnd: { pointerEvents: "none" },
   },
@@ -126,13 +122,9 @@ const PANEL_VARIANTS_EXPRESSIVE: Variants = {
     boxShadow: "var(--glass-toolbar-shadow)",
     pointerEvents: "auto",
     transition: {
-      type: "spring",
-      stiffness: 308,
-      damping: 43,
-      bounce: 0,
-      restDelta: 0.5,
-      restSpeed: 0.5,
-      opacity: { duration: 0.24, delay: 0.06 },
+      duration: 0.8,
+      ease: [0.4, 0, 0.2, 1],
+      opacity: { duration: 0.6 }
     },
     transitionEnd: { pointerEvents: "auto" },
   },
