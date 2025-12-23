@@ -3,6 +3,7 @@
 
 import * as React from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   HomeIcon,
@@ -24,12 +25,13 @@ function cx(...parts: Array<string | undefined | false | null>) {
   return parts.filter(Boolean).join(" ")
 }
 
+// Avoid fragile className selector escaping; we’ll use data-* selectors instead.
+// (If you do need escaping elsewhere, prefer CSS.escape when available.)
 function cssEscape(value: string) {
-  // CSS.escape is supported in modern browsers; add a safe fallback.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyCSS = (globalThis as any).CSS as { escape?: (v: string) => string } | undefined
   if (anyCSS?.escape) return anyCSS.escape(value)
-  return value.replace(/[^a-zA-Z0-9_-]/g, "\\$& ")
+  return value.replace(/([!"#$%&'()*+,./:;<=>?@[\]^`{|}~])/g, "\\$& ")
 }
 
 function sel(className: string) {
@@ -153,6 +155,16 @@ const PANEL_VARIANTS_REDUCED: Variants = {
     transition: { duration: 0.01 },
     transitionEnd: { pointerEvents: "auto" },
   },
+}
+
+const subnavVariants = {
+  collapsed: { opacity: 0, transition: { staggerChildren: 0.03, staggerDirection: -1 } },
+  expanded: { opacity: 1, transition: { delayChildren: 0.06, staggerChildren: 0.05 } },
+}
+
+const subnavItemVariants = {
+  collapsed: { opacity: 0, x: -8 },
+  expanded: { opacity: 1, x: 0 },
 }
 
 const GlassToolbar = React.forwardRef<HTMLElement, GlassToolbarProps>(function GlassToolbar(
@@ -314,15 +326,11 @@ const GlassToolbar = React.forwardRef<HTMLElement, GlassToolbarProps>(function G
     [allowPersistentHover, onSectionChange, primeTransientHover, updateHoverLock],
   )
 
-  // Precompute selectors so closest() works with hashed module classnames.
-  const pillSelector = React.useMemo(() => sel(styles.pill), [styles.pill])
-  const panelSelector = React.useMemo(() => sel(styles.panel), [styles.panel])
-  const railFooterSelector = React.useMemo(() => sel(styles.railFooter), [styles.railFooter])
-
   return (
     <aside
       ref={ref}
       className={cx(styles.root, className)}
+      data-glass-toolbar-root
       data-expanded={expanded ? "true" : "false"}
       style={style}
       onPointerLeave={() => {
@@ -346,10 +354,10 @@ const GlassToolbar = React.forwardRef<HTMLElement, GlassToolbarProps>(function G
         pointerFocusGate.current = true
         if (manualPinned) return
         const target = event.target as HTMLElement | null
-        const isActivator = Boolean(target?.closest(pillSelector))
-        const isPanel = Boolean(target?.closest(panelSelector))
-        const isUtility = Boolean(target?.closest(railFooterSelector))
-        if (isActivator || isPanel || isUtility) setPointerInside(true)
+        const withinPill = Boolean(target?.closest('[data-glass-toolbar="pill"]'))
+        const withinPanel = Boolean(target?.closest('[data-glass-toolbar="panel"]'))
+        const isUtility = Boolean(target?.closest(`.${cssEscape(styles.railFooter)}`))
+        if (withinPill || withinPanel || isUtility) setPointerInside(true)
         else setPointerInside(false)
       }}
       onPointerUpCapture={() => {
@@ -398,7 +406,15 @@ const GlassToolbar = React.forwardRef<HTMLElement, GlassToolbarProps>(function G
                 aria-label={section.label}
                 title={section.label}
                 data-has-children={hasChildren ? "true" : "false"}
+                data-glass-toolbar="pill"
               >
+                {isActive && (
+                  <motion.span
+                    layoutId="glass-toolbar-active-pill"
+                    className={styles.pillActiveBg}
+                    transition={{ type: "spring", stiffness: 520, damping: 40 }}
+                  />
+                )}
                 <div className={styles.pillIcon}>
                   <Icon aria-hidden="true" />
                 </div>
@@ -427,6 +443,7 @@ const GlassToolbar = React.forwardRef<HTMLElement, GlassToolbarProps>(function G
         className={styles.panel}
         id={panelId}
         aria-hidden={!expanded}
+        data-glass-toolbar="panel"
         initial={expanded ? "expanded" : "collapsed"}
         animate={expanded ? "expanded" : "collapsed"}
         variants={panelVariants}
@@ -438,56 +455,61 @@ const GlassToolbar = React.forwardRef<HTMLElement, GlassToolbarProps>(function G
         <div className={styles.panelBody}>
           <AnimatePresence initial={false} mode="wait">
             {activeSection?.items && activeSection.items.length > 0 ? (
-              <motion.ul
+              <motion.div
                 key={activeSection.id}
-                className={styles.subnav}
-                aria-label={`${activeSection.label} shortcuts`}
-                initial="hidden"
-                animate="enter"
-                exit="exit"
-                variants={menuVariants}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.22 } }}
+                exit={{ opacity: 0, y: 8, transition: { duration: 0.16 } }}
               >
-                {activeSection.items.map((item) => (
-                  <li key={item.id}>
-                    {item.href ? (
-                      <a
-                        href={item.href}
-                        onPointerEnter={() => {
-                          setPointerInside(true)
-                          updateHoverLock(true)
-                          primeTransientHover()
-                        }}
-                        onFocus={() => {
-                          setPointerInside(true)
-                          updateHoverLock(true)
-                          primeTransientHover()
-                        }}
-                      >
-                        <span>{item.label}</span>
-                        {item.description ? <small>{item.description}</small> : null}
-                      </a>
-                    ) : (
-                      <button
-                        type="button"
-                        onPointerEnter={() => {
-                          setPointerInside(true)
-                          updateHoverLock(true)
-                          primeTransientHover()
-                        }}
-                        onFocus={() => {
-                          setPointerInside(true)
-                          updateHoverLock(true)
-                          primeTransientHover()
-                        }}
-                        onClick={() => handleItemClick(item.id)}
-                      >
-                        <span>{item.label}</span>
-                        {item.description ? <small>{item.description}</small> : null}
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </motion.ul>
+                <motion.ul
+                  className={styles.subnav}
+                  aria-label={`${activeSection.label} shortcuts`}
+                  variants={subnavVariants}
+                  initial="collapsed"
+                  animate="expanded"
+                >
+                  {activeSection.items.map((item) => (
+                    <motion.li key={item.id} variants={subnavItemVariants}>
+                      {item.href ? (
+                        <Link
+                          href={item.href}
+                          onPointerEnter={() => {
+                            setPointerInside(true)
+                            updateHoverLock(true)
+                            primeTransientHover()
+                          }}
+                          onFocus={() => {
+                            setPointerInside(true)
+                            updateHoverLock(true)
+                            primeTransientHover()
+                          }}
+                        >
+                          <span>{item.label}</span>
+                          {item.description ? <small>{item.description}</small> : null}
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          onPointerEnter={() => {
+                            setPointerInside(true)
+                            updateHoverLock(true)
+                            primeTransientHover()
+                          }}
+                          onFocus={() => {
+                            setPointerInside(true)
+                            updateHoverLock(true)
+                            primeTransientHover()
+                          }}
+                          onClick={() => handleItemClick(item.id)}
+                        >
+                          <span>{item.label}</span>
+                          {item.description ? <small>{item.description}</small> : null}
+                        </button>
+                      )}
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              </motion.div>
             ) : (
               <motion.p
                 key={`${activeSection?.id ?? "none"}-empty`}

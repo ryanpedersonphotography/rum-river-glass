@@ -164,6 +164,8 @@
 
 /* Pills */
 .pill {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   border: 1px solid transparent;
   background: var(--glass-toolbar-pill-bg);
@@ -178,6 +180,20 @@
   cursor: pointer;
   color: var(--glass-toolbar-text);
   transition: transform 180ms var(--glass-toolbar-ease), background 180ms var(--glass-toolbar-ease), border-color 180ms var(--glass-toolbar-ease);
+}
+
+.pillActiveBg {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: var(--glass-toolbar-pill-active-bg);
+  z-index: 0;
+}
+
+.pillIcon,
+.pillLabel {
+  position: relative;
+  z-index: 1;
 }
 
 .pill:hover,
@@ -327,6 +343,17 @@
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 
+  /* CSS baseline (matches old glass-toolbar.css behavior): hidden by default,
+     revealed when data-expanded=true on the root. Helps if JS/motion hiccups. */
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.root[data-expanded="true"] .panel {
+  transform: translateX(0);
+  opacity: 1;
   pointer-events: auto;
 }
 
